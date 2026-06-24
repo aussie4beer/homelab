@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<ribcl VERSION="2.0">
+  <login USER_LOGIN="Administrator" PASSWORD="{{ ilo_password }}">
+    <user_info MODE="WRITE">
+      <!-- Modify the Administrator account password -->
+      <mod_user>
+        <user_login VALUE="Administrator"/>
+        <password VALUE="{{ ilo_password }}"/>
+        <admin_priv VALUE="Y"/>
+        <remote_cons_priv VALUE="Y"/>
+        <reset_server_priv VALUE="Y"/>
+        <virtual_media_priv VALUE="Y"/>
+        <config_ilo_priv VALUE="Y"/>
+      </mod_user>
+    </user_info>
+  </login>
+</ribcl>

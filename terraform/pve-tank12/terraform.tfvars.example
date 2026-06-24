@@ -1,0 +1,6 @@
+proxmox_endpoint  = "https://192.168.1.12:8006/"
+proxmox_api_token = "terraform@pve!terraform=<secret>"
+proxmox_node      = "pve-tank12"
+host_ip           = "192.168.1.12/24"
+host_gateway      = "192.168.1.1"
+vlan_ids          = []

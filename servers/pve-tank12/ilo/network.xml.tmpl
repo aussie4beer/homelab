@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<ribcl VERSION="2.0">
+  <login USER_LOGIN="Administrator" PASSWORD="{{ ilo_password }}">
+    <rib_info MODE="WRITE">
+      <mod_network_settings>
+        <ilo_nic_auto_select VALUE="N"/>
+        <shared_network_port VALUE="N"/>
+        <dhcp_enable VALUE="N"/>
+        <ip_address VALUE="192.168.1.139"/>
+        <subnet_mask VALUE="255.255.255.0"/>
+        <gateway_ip_address VALUE="192.168.1.1"/>
+        <dns_name VALUE="ilo-pve-tank12"/>
+        <domain_name VALUE="fosternet.home"/>
+        <prim_dns_server VALUE="192.168.1.1"/>
+        <sntp_server1 VALUE="pool.ntp.org"/>
+        <sntp_server2 VALUE="time.cloudflare.com"/>
+        <timezone VALUE="US/Eastern"/>
+      </mod_network_settings>
+    </rib_info>
+  </login>
+</ribcl>

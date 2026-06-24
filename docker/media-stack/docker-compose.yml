@@ -17,6 +17,7 @@ services:
       - BLOCK_MALICIOUS=off
       - FIREWALL_INPUT_PORTS=8080
       - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
+      - FIREWALL_VPN_OUTPUT_PORTS=6969,2710,80,443
     ports:
       - "8080:8080"
       - "6881:6881"
@@ -118,6 +119,7 @@ services:
       - HOMEPAGE_VAR_SONARR_KEY=${HOMEPAGE_VAR_SONARR_KEY}
       - HOMEPAGE_VAR_PROWLARR_KEY=${HOMEPAGE_VAR_PROWLARR_KEY}
       - HOMEPAGE_VAR_QBIT_PASSWORD=${HOMEPAGE_VAR_QBIT_PASSWORD}
+      - LOG_LEVEL=debug
     volumes:
       - ${CONFIG_ROOT}/homepage:/app/config
     ports:

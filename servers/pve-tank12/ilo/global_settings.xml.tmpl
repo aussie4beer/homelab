@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>
+<ribcl VERSION="2.0">
+  <login USER_LOGIN="Administrator" PASSWORD="{{ ilo_password }}">
+    <rib_info MODE="WRITE">
+      <mod_global_settings>
+        <session_timeout VALUE="30"/>
+        <ssh_status VALUE="Y"/>
+        <ssh_port VALUE="22"/>
+        <https_port VALUE="443"/>
+        <http_port VALUE="80"/>
+        <serial_cli_status VALUE="3"/>
+        <serial_cli_speed VALUE="5"/>
+        <min_password VALUE="8"/>
+        <authentication_failure_logging VALUE="Enabled-every 3rd failure"/>
+        <idle_connection_timeout VALUE="30"/>
+        <rbsu_post_ip VALUE="Y"/>
+        <remote_console_encryption VALUE="Y"/>
+        <terminal_services VALUE="N"/>
+      </mod_global_settings>
+    </rib_info>
+  </login>
+</ribcl>

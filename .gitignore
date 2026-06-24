@@ -2,3 +2,6 @@
 *.log
 **/config/
 **/cache/
+# iLO — never commit substituted XML
+servers/**/ilo/*.xml
+!servers/**/ilo/*.xml.tmpl
