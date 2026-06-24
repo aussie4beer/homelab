@@ -1,48 +1,22 @@
-# Pools as confirmed by pvesm status.
-# 12x 3.5" HDD bays are empty — media/archive pool to be added when populated.
+# storage.tf -- pve-tank12 storage configuration
 
-resource "proxmox_virtual_environment_storage" "local" {
-  node_name  = var.proxmox_node
-  storage_id = "local"
-  type       = "dir"
-  path       = "/var/lib/vz"
-
-  content {
-    iso_image          = true
-    container_template = true
-    backup             = true
-    snippets           = true
-  }
-
-  comment = "Local directory storage — ISOs, templates, backups"
+resource "proxmox_storage_directory" "local" {
+  id      = "local"
+  path    = "/var/lib/vz"
+  content = ["iso", "vztmpl", "backup", "snippets"]
 }
 
-resource "proxmox_virtual_environment_storage" "local_zfs" {
-  node_name  = var.proxmox_node
-  storage_id = "local-zfs"
-  type       = "zfspool"
-  pool       = "rpool/data"
-
-  content {
-    disk_image = true
-    container  = true
-    rootdir    = true
-  }
-
-  comment = "OS NVMe ZFS pool (256GB) — rpool"
+resource "proxmox_storage_zfspool" "local_zfs" {
+  id             = "local-zfs"
+  zfs_pool       = "rpool/data"
+  nodes          = [var.proxmox_node]
+  content        = ["images", "rootdir"]
+  thin_provision = true
 }
 
-resource "proxmox_virtual_environment_storage" "nvme_fast2" {
-  node_name  = var.proxmox_node
-  storage_id = "nvme-fast2"
-  type       = "zfspool"
-  pool       = "nvme-fast2"
-
-  content {
-    disk_image = true
-    container  = true
-    rootdir    = true
-  }
-
-  comment = "Primary workload ZFS pool — 5.81TB stripe (2x 3.2TB NVMe PCIe)"
+resource "proxmox_storage_zfspool" "nvme_fast2" {
+  id       = "nvme-fast2"
+  zfs_pool = "nvme-fast2"
+  nodes    = [var.proxmox_node]
+  content  = ["images", "rootdir"]
 }
