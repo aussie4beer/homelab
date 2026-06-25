@@ -20,3 +20,10 @@ resource "proxmox_storage_zfspool" "nvme_fast2" {
   nodes    = [var.proxmox_node]
   content  = ["images", "rootdir"]
 }
+
+resource "proxmox_storage_zfspool" "media" {
+  id       = "media"
+  zfs_pool = "media"
+  nodes    = [var.proxmox_node]
+  content  = ["rootdir"]
+}
