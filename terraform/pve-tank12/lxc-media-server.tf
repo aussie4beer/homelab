@@ -1,24 +1,15 @@
-# lxc-media-server.tf -- LXC 200 media-server migration target
+# lxc-media-server.tf -- LXC 200 media-server
 #
-# Source config from pve1 (pre-migration):
-#   pct config 200 on pve1.fosternet.home
-#
-# Storage changes from pve1:
-#   rootfs:    nvme-fast        -> nvme-fast2
-#   downloads: /nvme-fast/downloads (bind) -> nvme-fast2 subvolume
-#   media:     /media (bind, WD external)  -> /media (bind, WD in 12-bay bay)
-#              pool absent until drive physically moved and imported:
-#              zpool import media
-#
-# Network change from pve1:
-#   ip=dhcp -> static 192.168.1.188/24 (existing Unifi reservation retained)
+# Restored from vzdump backup taken on pve1 2026-06-25.
+# Bind mounts are host paths -- not managed ZFS volumes.
+# TUN device entries are written directly to /etc/pve/lxc/200.conf;
+# the Proxmox API does not support lxc.* raw config params.
 
 resource "proxmox_virtual_environment_container" "media_server" {
-  node_name   = var.proxmox_node
-  vm_id       = 200
-  description = "Media stack -- Jellyfin, Radarr, Sonarr, Prowlarr, qBittorrent, Gluetun"
-
-  started     = true
+  node_name    = var.proxmox_node
+  vm_id        = 200
+  description  = "Media stack -- Jellyfin, Radarr, Sonarr, Prowlarr, qBittorrent, Gluetun"
+  started      = false
   unprivileged = false
 
   cpu {
@@ -31,7 +22,7 @@ resource "proxmox_virtual_environment_container" "media_server" {
   }
 
   operating_system {
-    type           = "debian"
+    type             = "debian"
     template_file_id = "local:vztmpl/debian-12-standard_12.7-1_amd64.tar.zst"
   }
 
@@ -40,28 +31,27 @@ resource "proxmox_virtual_environment_container" "media_server" {
     size         = 16
   }
 
-  # Downloads subvolume on nvme-fast2
-  mount_point {
-    volume = "nvme-fast2"
-    size   = "100G"
-    path   = "/mnt/downloads"
-  }
-
-  # Media bind mount -- WD drive in 12-bay HDD slot
-  # Pool must be imported first: zpool import media
+  # Bind mount -- WD drive imported as ZFS pool 'media', mounted at /media
   mount_point {
     volume = "/media"
     path   = "/mnt/media"
   }
 
+  # Bind mount -- downloads dataset on nvme-fast2
+  mount_point {
+    volume = "/nvme-fast2/downloads"
+    path   = "/mnt/downloads"
+  }
+
   network_interface {
-    name     = "eth0"
-    bridge   = "vmbr0"
+    name        = "eth0"
+    bridge      = "vmbr0"
     mac_address = "BC:24:11:90:F3:1D"
-    firewall = false
+    firewall    = false
   }
 
   initialization {
+    hostname = "media-server"
     ip_config {
       ipv4 {
         address = "192.168.1.188/24"
@@ -70,7 +60,7 @@ resource "proxmox_virtual_environment_container" "media_server" {
     }
     dns {
       servers = ["192.168.1.1"]
-      domain = "fosternet.home"
+      domain  = "fosternet.home"
     }
   }
 
@@ -78,9 +68,12 @@ resource "proxmox_virtual_environment_container" "media_server" {
     nesting = true
   }
 
-  # TUN device for Gluetun VPN -- required for ProtonVPN WireGuard
-  # These are written via SSH as the Proxmox API does not support lxc[] params.
-  # Manually verify /etc/pve/lxc/200.conf contains:
-  #   lxc.cgroup2.devices.allow: c 10:200 rwm
-  #   lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+  lifecycle {
+    ignore_changes = [
+      operating_system,
+      mount_point,
+      initialization[0].hostname,
+      console,
+    ]
+  }
 }
