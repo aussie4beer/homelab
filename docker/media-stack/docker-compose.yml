@@ -15,13 +15,15 @@ services:
       - SERVER_COUNTRIES=United States
       - TZ=${TZ}
       - BLOCK_MALICIOUS=off
-      - FIREWALL_INPUT_PORTS=8080
+      - FIREWALL_INPUT_PORTS=8080,8081,8085
       - FIREWALL_OUTBOUND_SUBNETS=192.168.1.0/24
-      - FIREWALL_VPN_OUTPUT_PORTS=6969,2710,80,443
+      - FIREWALL_VPN_OUTPUT_PORTS=6969,2710,80,443,2710,563
     ports:
       - "8080:8080"
       - "6881:6881"
       - "6881:6881/udp"
+      - "8081:8081"
+      - "8085:8085"
 
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -124,3 +126,30 @@ services:
       - ${CONFIG_ROOT}/homepage:/app/config
     ports:
       - "3000:3000"
+
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    restart: unless-stopped
+    network_mode: service:gluetun
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    volumes:
+      - ${CONFIG_ROOT}/sabnzbd:/config
+      - ${DOWNLOADS_ROOT}:/downloads
+    depends_on:
+      - gluetun
+
+  easynews-indexer:
+    image: ghcr.io/kyberdot/easynews-indexer:latest
+    container_name: easynews-indexer
+    restart: unless-stopped
+    network_mode: service:gluetun
+    environment:
+      - EASYNEWS_USER=${EASYNEWS_USER}
+      - EASYNEWS_PASS=${EASYNEWS_PASS}
+      - NEWZNAB_APIKEY=${EASYNEWS_API_KEY}
+    depends_on:
+      - gluetun
