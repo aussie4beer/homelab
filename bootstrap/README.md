@@ -70,6 +70,14 @@ exists (e.g. Proxmox injects the host's root key at container creation).
   command line and are briefly visible in the process list on the Proxmox
   host. This is acceptable on a trusted LAN but avoid using this mode over
   an untrusted network.
+- Directories created or written by services that previously ran as root will
+  be owned by root and inaccessible to `sfoster`. Fix ownership after
+  bootstrapping wherever this applies:
+  ```bash
+  sudo chown -R sfoster:sfoster /opt/mediaconfig
+  ```
+  Check any other paths the container's services write to (config dirs,
+  data dirs, log dirs) and apply the same pattern as needed.
 - When staging the script from `pve-tank12` (e.g. before `pct push`), pull
   from `iac-mgmt` as root:
   ```bash
