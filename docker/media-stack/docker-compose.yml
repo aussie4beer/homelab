@@ -97,7 +97,8 @@ services:
       - ${CONFIG_ROOT}/qbittorrent:/config
       - ${DOWNLOADS_ROOT}:/downloads
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
 
   flaresolverr:
     image: ghcr.io/flaresolverr/flaresolverr:latest
@@ -121,11 +122,15 @@ services:
       - HOMEPAGE_VAR_SONARR_KEY=${HOMEPAGE_VAR_SONARR_KEY}
       - HOMEPAGE_VAR_PROWLARR_KEY=${HOMEPAGE_VAR_PROWLARR_KEY}
       - HOMEPAGE_VAR_QBIT_PASSWORD=${HOMEPAGE_VAR_QBIT_PASSWORD}
+      - HOMEPAGE_VAR_SABNZBD_KEY=${HOMEPAGE_VAR_SABNZBD_KEY}
       - LOG_LEVEL=debug
     volumes:
       - ${CONFIG_ROOT}/homepage:/app/config
     ports:
       - "3000:3000"
+    depends_on:
+      gluetun:
+        condition: service_healthy
 
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -152,4 +157,5 @@ services:
       - EASYNEWS_PASS=${EASYNEWS_PASS}
       - NEWZNAB_APIKEY=${EASYNEWS_API_KEY}
     depends_on:
-      - gluetun
+      gluetun:
+        condition: service_healthy
